@@ -14,4 +14,6 @@
 
 #Use 4 threads
 
+./itmv_mult_test_omp 1
+./itmv_mult_test_omp 2
 ./itmv_mult_test_omp 4
