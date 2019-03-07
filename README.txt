@@ -29,36 +29,60 @@ loop so that the team of threads can compute it more efficiently. For this we us
 Report for Question 2 
 How is the code parallelized?
 
+if(mappingtype == BLOCK_MAPPING) {
+    mappingtype = BLOCK_CYCLIC;
+    chunksize = matrix_dim / threadcnt;
+  }
+
+This checks to see if a Block cyclic cycle is passed in. If this is the case then the chunk size needs to be modified
+to the number of iterations divided by the number of threads.
+
 
 ----------------------------------------------------------------------------
 Parallel time/speedup/efficiency using 2 and 4 cores under different scheduling methods
 
 
-1 Thread
+|-------+------+------+---------+------------------+-----------+-----------+------------|
+| Cores |    n |    t | mapping | cyclic-blocksize |  run-time |   speedup | efficiency |
+|-------+------+------+---------+------------------+-----------+-----------+------------|
+|     1 | 4096 | 1024 | block   | n/a              | 27.313195 |       n/a |        n/a |
+|     2 | 4096 | 1024 | block   | n/a              | 20.339510 | 1.3428639 | 0.67056075 |
+|     4 | 4096 | 1024 | block   | n/a              | 11.849637 | 2.3049816 | 0.57624540 |
+|-------+------+------+---------+------------------+-----------+-----------+------------|
 
-Test 12: n=4K t=1K upper block mapping: Wall clock time = 27.316558 with 1 threads
-Test 13: n=4K t=1K upper block cylic (r=1): Wall clock time = 27.309582 with 1 threads
-Test 14: n=4K t=1K upper block cyclic(r=16): Wall clock time = 27.314724 with 1 threads
-Test 14a: n=4K t=1K upper dynamic(r=16): Wall clock time = 27.322406 with 1 threads
 
-2 Threads
+|-------+------+------+--------------+------------------+-----------+-----------+------------|
+| Cores |    n |    t | mapping      | cyclic-blocksize |  run-time |   speedup | efficiency |
+|-------+------+------+--------------+------------------+-----------+-----------+------------|
+|     1 | 4096 | 1024 | block-cyclic |                1 | 27.309582 |       n/a |        n/a |
+|     2 | 4096 | 1024 | block-cyclic |                1 | 14.208099 | 1.9221137 |  0.9610569 |
+|     4 | 4096 | 1024 | block-cyclic |                1 |  7.399786 | 3.6905907 |  0.9226477 |
+|-------+------+------+--------------+------------------+-----------+-----------+------------|
 
-Test 12: n=4K t=1K upper block mapping: Wall clock time = 20.339510 with 2 threads
-Test 13: n=4K t=1K upper block cylic (r=1): Wall clock time = 14.208099 with 2 threads
-Test 14: n=4K t=1K upper block cyclic(r=16): Wall clock time = 13.686344 with 2 threads
-Test 14a: n=4K t=1K upper dynamic(r=16): Wall clock time = 13.779651 with 2 threads
 
-4 Threads 
+|-------+------+------+--------------+------------------+-----------+-----------+------------|
+| Cores |    n |    t | mapping      | cyclic-blocksize |  run-time |   speedup | efficiency |
+|-------+------+------+--------------+------------------+-----------+-----------+------------|
+|     1 | 4096 | 1024 | block-cyclic |               16 | 27.314724 |       n/a |        n/a |
+|     2 | 4096 | 1024 | block-cyclic |               16 | 13.686344 |  1.995765 |   0.997882 |
+|     4 | 4096 | 1024 | block-cyclic |               16 |  7.015504 |   3.89348 |   0.97337  |
+|-------+------+------+--------------+------------------+-----------+-----------+------------|
 
-Test 12: n=4K t=1K upper block mapping: Wall clock time = 11.849637 with 4 threads
-Test 13: n=4K t=1K upper block cylic (r=1): Wall clock time = 7.399786 with 4 threads
-Test 14: n=4K t=1K upper block cyclic(r=16): Wall clock time = 7.015504 with 4 threads
-Test 14a: n=4K t=1K upper dynamic(r=16): Wall clock time = 6.972659 with 4 threads
+
+|-------+------+------+---------+-----------+-----------+-----------+------------|
+| Cores |    n |    t | mapping | chunksize |  run-time |   speedup | efficiency |
+|-------+------+------+---------+-----------+-----------+-----------+------------|
+|     1 | 4096 | 1024 | dynamic |        16 | 27.322406 |       n/a |        n/a |
+|     2 | 4096 | 1024 | dynamic |        16 | 13.779651 |  1.982808 |   0.991404 |
+|     4 | 4096 | 1024 | dynamic |        16 |  6.972659 |  3.918506 |   0.979627 |
+|-------+------+------+---------+-----------+-----------+-----------+------------|
+
 
 
 If there are significant performance differences among different thread scheduling  methods,
 provide a short reason. 
 
-
+Given the upper-triangular matrix, the efficiency of the pure block mapping method suffers from load 
+imbalancing (more zeros in the lower rows). The speedup of this method suffers as well compared to the others.
 
 
