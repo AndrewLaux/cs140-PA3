@@ -10,6 +10,19 @@ Email of Student 2:
 Report for Question 1 
 How is the code parallelized?
 
+Q1 - pi
+
+#pragma omp parallel num_threads(threadcnt) private(toss, x, y, distance_squared) reduction(+: sum)
+This indicates that we wish to run the following code section in parallel.
+num_threads clause specifies the number of threads we want, in this case the arg threadcnt.
+The private clause localizes the list of variables to each thread. We don't want threads intefering with eachother.
+Finally the reduction the clause tells each thread to add its sum to the main thread sum which assigns it to
+number_in_circle.
+
+#pragma omp for
+The previous line indicates that we wish to run the code section in parallel but that is not precisely what we need.
+Instead of having each thread process the entire toss loop we want each thread to handle a different section of the
+loop so that the team of threads can compute it more efficiently. For this we use the omp for declaration.
 
 
 ----------------------------------------------------------------------------
