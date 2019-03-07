@@ -23,11 +23,16 @@ long long int number_of_tosses;
 
 void parallel_loop(int threadcnt) {
   /*Your solution with OpenMP*/
+
   long long int toss;
   long long int sum = 0;
   double x, y, distance_squared;
   srandom(0);
 
+ 
+#pragma omp parallel num_threads(threadcnt) private(toss, x, y, distance_squared) reduction(+: sum)
+ {
+  #pragma omp for
   for (toss = 0; toss < number_of_tosses; toss++) {
     x = 2 * random() / ((double)RAND_MAX) - 1.0;
     y = 2 * random() / ((double)RAND_MAX) - 1.0;
@@ -36,7 +41,8 @@ void parallel_loop(int threadcnt) {
       sum++;
     }
   }
-  number_in_circle = sum;
+ }
+  number_in_circle += sum;
 }
 
 /*---------------------------------------------------------------------

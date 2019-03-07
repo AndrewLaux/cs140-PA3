@@ -10,7 +10,7 @@
 #SBATCH --ntasks-per-node=4
 #SBATCH --export=ALL
 # Next line limits the job execution time at most 3 minute.
-#SBATCH -t 00:03:00
+#SBATCH -t 00:59:00
 
 #Use 4 threads
 

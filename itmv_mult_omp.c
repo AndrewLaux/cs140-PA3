@@ -76,15 +76,30 @@ void parallel_itmv_mult(int threadcnt, int mappingtype, int chunksize) {
   /*Your solutuion with OpenMP*/
   int i, k;
 
-  for (k = 0; k < no_iterations; k++) {
-    for (i = 0; i < matrix_dim; i++) {
-      mv_compute(i);
-    }
+  if(mappingtype == BLOCK_MAPPING) {
+    mappingtype = BLOCK_CYCLIC;
+    chunksize = matrix_dim / threadcnt;
+  }
 
-    for (i = 0; i < matrix_dim; i++) {
-      vector_x[i] = vector_y[i];
+  omp_set_schedule(mappingtype, chunksize);
+
+  #pragma omp parallel num_threads(threadcnt) private(k)
+  {
+    
+    for (k = 0; k < no_iterations; k++) {
+      
+      #pragma omp for schedule(runtime)
+      for (i = 0; i < matrix_dim; i++) {
+        mv_compute(i);
+      }
+
+      #pragma omp for schedule(runtime)
+      for (i = 0; i < matrix_dim; i++) {
+        vector_x[i] = vector_y[i];
+      }
     }
   }
+  
 }
 
 /*-------------------------------------------------------------------
